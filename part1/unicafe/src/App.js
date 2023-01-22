@@ -1,56 +1,56 @@
-import { useState } from 'react'
-
 const App = () => {
-  const [good, setGood] = useState(null);
-  const [neutral, setNeutral] = useState(null);
-  const [bad, setBad] = useState(null);
+  const course = {
+    name: 'Half Stack application development',
+    parts: [
+      {
+        name: 'Fundamentals of React',
+        exercises: 10
+      },
+      {
+        name: 'Using props to pass data',
+        exercises: 7
+      },
+      {
+        name: 'State of a component',
+        exercises: 14
+      }
+    ]
+  }
 
-  const handleGood = () => {
-    setGood(prev => prev + 1);
-  }
-  const handleNeutral = () => {
-    setNeutral(prev => prev + 1);
-  }
-  const handleBad = () => {
-    setBad(prev => prev + 1);
-  }
 
   return (
     <div>
-      <h1>give feedback</h1>
-      <Button fn={handleGood} text="good"></Button>
-      <Button fn={handleNeutral} text="neutral"></Button>
-      <Button fn={handleBad} text="bad"></Button>
-      <Statistics good={good} neutral={neutral} bad={bad}></Statistics>
+      <Header course = {course.name}/>
+      <Content parts = {course.parts}/>
+      <Total parts = {course.parts}/>
     </div>
   )
 }
-const Statistics = ({good, neutral, bad}) => {
-  if(!(good || neutral || bad)){
-    return(
-      <p>No feedback given</p>
-    );
-  }
+const Header = ({course}) => {
+  return(
+    <h1>{course}</h1>
+  )
+}
+const Content = ({parts}) => {
   return(
     <div>
-      <h1>statistics</h1>
-      <StatisticsLine text="good" value={good}/>
-      <StatisticsLine text="neutral" value={neutral}/>
-      <StatisticsLine text="bad" value={bad}/>
-      <StatisticsLine text="all" value={good + bad + neutral}/>
-      <StatisticsLine text="average" value={(good + bad * -1) / (good + bad + neutral)}/>
-      <StatisticsLine text="good" value={good / (good + bad + neutral) * 100 + "%"}/>
+      <Part part={parts[0]}/>
+      <Part part={parts[1]}/>
+      <Part part={parts[2]}/>
     </div>
-  );
+  )
 }
-const StatisticsLine = ({text, value}) => {
+const Part = ({part}) => {
   return(
-    <p>{text} {value}</p>
-  );
+    <p>
+      {part.name} {part.exercises}
+    </p>
+  )
 }
-const Button = ({fn, text}) => {
+const Total = ({parts}) => {
   return(
-    <button onClick={fn}>{text}</button>
-  );
+    <p>Number of exercises {parts[0].exercises + parts[1].exercises + parts[2].exercises}</p>
+  )
 }
-export default App
+
+export default App;
