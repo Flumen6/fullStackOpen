@@ -3,12 +3,14 @@ import Filter from "./components/Filter";
 import PersonForm from './components/PersonForm';
 import Persons from "./components/Persons";
 import serv from './serv/serv';
+import Noti from './components/Noti';
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [search, setSearch] = useState('')
+  const [msg, setMsg] = useState({msg: null, type: "noti"})
 
   useEffect(() => {
     serv.getAll()
@@ -32,12 +34,26 @@ const App = () => {
           console.log(res);
           console.log(persons.filter(person => person.id !== res.id));
           setPersons([...persons.filter(person => person.id !== res.id), res])
+          setMsg({msg:`Changet to ${newNumber}`, type:"noti"})
+          setTimeout(() => {
+            setMsg({msg:null, type:""})
+          }, 3000);
+        }).catch((error) => {
+          setMsg({msg:`${newName} does not exists`, type:"err"})
+          setTimeout(() => {
+            setMsg({msg:null, type:""})
+          }, 3000);
+          setPersons([...persons.filter(person => person.id !== id)])
         })
       }
     } else {
       serv.create({name: newName, number: newNumber})
         .then(res => {
           setPersons([...persons, res])
+          setMsg({msg:`Added ${newName}`, type:"noti"})
+          setTimeout(() => {
+            setMsg({msg:null, type:""})
+          }, 3000);
           setNewName('');
           setNewNumber('');
         })
@@ -56,6 +72,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Noti msg={msg.msg} type={msg.type}></Noti>
       <Filter fn={handleSearch} value={search}></Filter>
 
       <h2>add a new</h2>
