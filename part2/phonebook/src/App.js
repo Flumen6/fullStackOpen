@@ -1,18 +1,21 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Filter from "./components/Filter";
 import PersonForm from './components/PersonForm';
-import Persons from "./components/Persons"
+import Persons from "./components/Persons";
+import serv from './serv/serv';
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
-  ]) 
+  const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [search, setSearch] = useState('')
+
+  useEffect(() => {
+    serv.getAll()
+      .then(res => {
+        setPersons(res)
+      })
+  }, [])
 
   const handleNameChange = (event) => {
     setNewName(event.target.value);
@@ -23,11 +26,28 @@ const App = () => {
   const handleSubmit = (event) => {
     event.preventDefault()
     if (persons.map(preson => preson.name).includes(newName)) {
-      alert(`${newName} is already added to phonebook`)
+      if (window.confirm(`${newName} is already added, do u want to update it?`)) {
+        const id = persons.find(person => person.name = newName).id
+        serv.update(id, {name: newName, number: newNumber}).then((res) => {
+          console.log(res);
+          console.log(persons.filter(person => person.id !== res.id));
+          setPersons([...persons.filter(person => person.id !== res.id), res])
+        })
+      }
     } else {
-      setPersons(persons.concat({name: newName, number: newNumber}))
-      setNewName('');
-      setNewNumber('');
+      serv.create({name: newName, number: newNumber})
+        .then(res => {
+          setPersons([...persons, res])
+          setNewName('');
+          setNewNumber('');
+        })
+    }
+  }
+  const handleDelete = (id) => {
+    if (window.confirm(`Delete ${persons.find(person => person.id === id).name}?`)) {
+      serv.rm(id).then(() => {
+        setPersons(persons.filter(person => person.id !== id))
+      })
     }
   }
   const handleSearch = (event) => {
@@ -42,7 +62,7 @@ const App = () => {
       <PersonForm fnName={handleNameChange} fnNumber={handleNumberChange} fnSubmit={handleSubmit} name={newName} number={newNumber}/>
 
       <h2>Numbers</h2>
-      <Persons persons={persons} search={search}></Persons>
+      <Persons persons={persons} search={search} fn={handleDelete}></Persons>
     </div>
   )
 }
