@@ -5,6 +5,7 @@ const app = express()
 
 app.use(express.json())
 app.use(cors())
+app.use(express.static('build'))
 
 morgan.token('content', (req, res) => { 
   return JSON.stringify(req.body)
@@ -50,17 +51,17 @@ const generateId = () => {
   return maxId + 1
 }
 
-app.get('/', (request, response) => {
+app.get('/api/', (request, response) => {
     response.json(phonebook)
 })
 
-app.get('/info', (request, response) => {
+app.get('/api/info', (request, response) => {
     response.send(`
         <p>Phonebook has info about ${phonebook.length}</p>
         <p> ${Date()}</p>
     `)
 })
-app.get('/:id', (request, response) => {
+app.get('/api/:id', (request, response) => {
     const id = request.params.id
     const phone = phonebook.find(phone => phone.id == id)
     if (phone) {
@@ -69,13 +70,13 @@ app.get('/:id', (request, response) => {
         response.status(404).end()
       }
 })
-app.delete('/:id', (request, response) => {
+app.delete('/api/:id', (request, response) => {
     const id = request.params.id
     phonebook = phonebook.filter(phone => phone.id != id)
     response.status(204).end()
 })
 
-app.post('/', (request, response) => {
+app.post('/api/', (request, response) => {
   const body = request.body
   if (!body.name || !body.number) {
     return response.status(400).json({ 

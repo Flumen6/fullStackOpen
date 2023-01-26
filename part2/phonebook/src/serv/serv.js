@@ -1,5 +1,5 @@
 import axios from 'axios';
-const http = "/"
+const http = "/api"
 
 const getAll = () => {
     return axios.get(http).then(res => res.data)
