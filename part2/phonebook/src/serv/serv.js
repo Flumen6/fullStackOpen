@@ -1,5 +1,5 @@
 import axios from 'axios';
-const http = "http://localhost:3002"
+const http = "/"
 
 const getAll = () => {
     return axios.get(http).then(res => res.data)
